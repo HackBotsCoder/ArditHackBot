@@ -1,149 +1,264 @@
 <!DOCTYPE html>
-<html lang="sq">
+<html lang="sq" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Parashikimet e AI – Depozita</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    .console-box {
-      font-family: monospace;
-      background-color: #1a1a1a;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 0 20px #00ff88;
-      color: #00ff88;
-      height: 250px;
-      overflow-y: auto;
-    }
-    .loading-screen {
-      font-family: monospace;
-      background: #000;
-      color: #00ff88;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      flex-direction: column;
-      z-index: 50;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-    }
-    .hidden-screen { display: none; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parashikimet e AI – Depozita</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* Кастомные стили для красоты */
+    body {
+      background: radial-gradient(circle at top, #111827, #000000);
+    }
+    .glass-card {
+      background: rgba(31, 41, 55, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .console-box {
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #0a0a0a;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      border: 1px solid #00ff88;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+      color: #00ff88;
+      height: 250px;
+      overflow-y: auto;
+      animation: pulse-border 2s infinite;
+    }
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
+      50% { box-shadow: 0 0 25px rgba(0, 255, 136, 0.6); }
+    }
+    .loading-screen {
+      background: #000;
+      color: #00ff88;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+    }
+    .loader {
+      border: 4px solid rgba(0, 255, 136, 0.2);
+      border-top: 4px solid #00ff88;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .hidden-screen { opacity: 0; pointer-events: none; visibility: hidden; }
+    
+    /* Красивые градиентные кнопки */
+    .btn-primary {
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+    }
+    .btn-success {
+      background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    }
+    .btn-warning {
+      background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+    }
+  </style>
 </head>
-<body class="bg-gray-900 text-white font-sans">
-  <div id="loading" class="loading-screen">
-    <p>Po ngarkohet... Ju lutemi prisni ndërsa përgatisim përvojën tuaj.</p>
-  </div>
-  <div id="mainContent" class="hidden-screen">
-    <header class="w-full bg-gray-800 p-4 flex justify-between items-center">
-      <h1 class="text-xl font-bold text-green-400">Parashikimet e AI 1xBet</h1>
-      <nav class="space-x-4">
-        <a href="#how" class="hover:text-green-400">Si funksionon</a>
-        <a href="#games" class="hover:text-green-400">Lojërat</a>
-        <a href="#start" class="hover:text-green-400">Fillo</a>
-    </nav>
-    </header>
-    <section class="min-h-screen flex flex-col items-center justify-center px-4 text-center">
-      <h2 class="text-3xl md:text-5xl font-bold mb-6">
-        Fito para të vërteta me parashikimet e lojërave nga AI
-      </h2>
-      <div class="mb-4 text-lg font-semibold text-yellow-300">
-        👋 Mirësevini në shërbimin zyrtar të <span class="text-green-400">Ardit</span>!
-      </div>
-      <p class="max-w-xl mb-8 text-gray-300">
-        Bashkohuni me mijëra përdorues që fitojnë me AI-në tonë inteligjente në Aviator, Mines dhe Penalty. Saktësi 98%, parashikime në kohë reale dhe tërheqje të menjëhershme!
-      </p>
-            <input id="userId" type="text" placeholder="Shkruani ID-në tuaj të 1xBet" class="bg-gray-700 text-white p-3 rounded-md mb-4" />
-      <button id="connectButton" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-xl text-lg transition">Lidh llogarinë</button>
-            <div id="connectionSuccess" class="hidden text-green-400 font-bold mt-6">
-        <p>ID e llogarisë: <span id="accountIdDisplay">1234567890</span> u lidh me sukses!</p>
-        <p>Statusi: Aktiv | Saktësia e parashikimit 100% | Algoritmi i AI u analizua</p>
-        <button id="getSignalButton" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-xl text-lg transition mt-4">Merr sinjal</button>
-      </div>
-            <div id="errorBox" class="hidden bg-red-600 p-6 rounded-xl max-w-md mx-auto mt-6">
-        <h2 class="text-xl font-bold mb-2">⚠️ Depozita nuk u gjet</h2>
-        <p class="mb-4">Duket se bilanci juaj është bosh. Ju lutemi bëni një depozitë prej të paktën <strong>500 Lek ose më shumë</strong> për të zhbllokuar qasjen në sinjale dhe për të filluar të gjeneroni fitim.</p>
-        <a href="https://reffpa.com/L?tag=d_5319977m_32259c_&site=5319977&ad=32259&r=registration" target="_blank" id="depositButton" class="inline-block bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-lg transition">
-          Depozito tani në 1xBet
-        </a>
-                <div class="mt-6 bg-red-800 text-white p-4 rounded-lg font-bold text-center">
-          <div class="mb-1 text-lg">Kodi juaj promocional: <span class="bg-black p-1 rounded text-green-400">SSF78</span></div>
-          <div>Mos harroni të regjistroheni <span class="underline">vetëm</span> me këtë kod për qasje të plotë në të gjitha funksionet!</div>
-        </div>
-      </div>
-    </section>
-        <section class="bg-gray-800 py-12 px-6 text-center">
-      <h3 class="text-2xl font-bold text-green-400 mb-6">Fituesit e Sotëm (Lek)</h3>
-      <div class="grid md:grid-cols-2 gap-4 text-left max-w-4xl mx-auto text-sm text-green-300">
-      <p>👤 Përdoruesi: 1218473422 – 506,560 Lek</p>
-      <p>👤 Përdoruesi: 9912384741 – 438,000 Lek</p>
-      <p>👤 Përdoruesi: 3099234822 – 282,400 Lek</p>
-      <p>👤 Përdoruesi: 1187339121 – 200,000 Lek</p>
-      <p>👤 Përdoruesi: 4412900113 – 257,000 Lek</p>
-      <p>👤 Përdoruesi: 8283721091 – 368,800 Lek</p>
-      <p>👤 Përdoruesi: 7751937742 – 214,100 Lek</p>
-      <p>👤 Përdoruesi: 5554921811 – 186,600 Lek</p>
-      <p>👤 Përdoruesi: 1983238742 – 160,000 Lek</p>
-      <p>👤 Përdoruesi: 3377749301 – 144,200 Lek</p>
-      </div>
-    </section>
-        <section id="games" class="bg-gray-800 py-12 px-6 text-center">
-      <h3 class="text-2xl font-bold text-green-400 mb-6">Lojërat e Mbështetura</h3>
-      <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-        <div class="bg-gray-700 p-6 rounded-xl shadow-lg">
-          <h4 class="text-xl font-bold mb-2">🎮 Aviator</h4>
-          <p class="text-gray-300">Parashikoni se kur të tërhiqni paratë para se avioni të ngrihet. AI ynë zbulon modelet në kohë reale.</p>
-        </div>
-        <div class="bg-gray-700 p-6 rounded-xl shadow-lg">
-          <h4 class="text-xl font-bold mb-2">💣 Mines</h4>
-          <p class="text-gray-300">Shmangni bombat, merrni fitimin tuaj. Sistemi ynë gjen rrugë me rrezik të ulët për fitime maksimale.</p>
-        </div>
-        <div class="bg-gray-700 p-6 rounded-xl shadow-lg">
-          <h4 class="text-xl font-bold mb-2">🥅 Penalty</h4>
-          <p class="text-gray-300">Dijeni se ku të gjuani ose të hidheni. Mposhtni portierin me parashikime të bazuara në të dhëna.</p>
-        </div>
-      </div>
-    </section>
-        <section id="how" class="bg-gray-900 py-12 px-6 text-center">
-      <h3 class="text-2xl font-bold text-green-400 mb-6">Si funksionon</h3>
-      <div class="max-w-3xl mx-auto space-y-4 text-gray-300">
-        <p>📡 AI ynë analizon të dhënat e lojërave drejtpërdrejt dhe historike 24/7.</p>
-        <p>💡 Identifikon modelet që mundësojnë fitime të vazhdueshme.</p>
-        <p>📲 Ju merrni sinjale të besueshme në kohë reale drejtpërdrejt në pajisjen tuaj.</p>
-      </div>
-    </section>
-    <section class="bg-black py-12 px-6 text-center">
-      <h3 class="text-xl font-bold text-green-400 mb-4">[ Konsola – Ditari i monitorimit ]</h3>
-      <div class="console-box max-w-3xl mx-auto text-left" id="console">
-        <p>[INFO] Shërbimi i parashikimit është aktiv ✅</p>
-      </div>
-    </section>
-    <footer class="text-center text-gray-500 text-sm py-6">
-      © 2025 Parashikimet e AI. Nuk jemi të lidhur me 1xBet. Përdoreni me përgjegjësi.
-    </footer>
-  </div>
-  <script>
-    setTimeout(() => {
-      document.getElementById("loading").classList.add("hidden-screen");
-      document.getElementById("mainContent").classList.remove("hidden-screen");
-    }, 3000);
+<body class="text-white font-sans min-h-screen flex flex-col">
 
-    document.getElementById("connectButton").addEventListener("click", () => {
-      const userId = document.getElementById("userId").value;
-      if (userId) {
-        document.getElementById("accountIdDisplay").innerText = userId;
-        document.getElementById("connectionSuccess").classList.remove("hidden");
-        document.getElementById("errorBox").classList.add("hidden");
-      }
-    });
+  <div id="loading" class="loading-screen">
+    <div class="loader"></div>
+    <p class="font-mono animate-pulse">Duke u lidhur me serverët e AI...</p>
+  </div>
 
-    document.getElementById("getSignalButton").addEventListener("click", () => {
-      document.getElementById("errorBox").classList.remove("hidden");
-    });
-  </script>
+  <div id="mainContent" class="hidden-screen flex-grow transition-opacity duration-1000">
+    
+    <header class="w-full glass-card p-4 flex justify-between items-center sticky top-0 z-50">
+      <h1 class="text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
+        AI PREDICTIONS
+      </h1>
+      <nav class="space-x-4 hidden md:block font-medium">
+        <a href="#how" class="hover:text-green-400 transition-colors">Si funksionon</a>
+        <a href="#games" class="hover:text-green-400 transition-colors">Lojërat</a>
+        <a href="#start" class="bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded-lg transition-colors">Fillo</a>
+      </nav>
+    </header>
+
+    <section id="start" class="pt-24 pb-16 flex flex-col items-center justify-center px-4 text-center">
+      <div class="glass-card p-8 md:p-12 rounded-3xl max-w-2xl w-full shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-green-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+        <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+
+        <h2 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
+          Fito para të vërteta me <span class="text-green-400">AI</span>
+        </h2>
+        <div class="mb-6 inline-block bg-gray-800 border border-gray-600 px-4 py-2 rounded-full text-sm font-semibold text-yellow-300">
+          👋 Mirësevini nga <span class="text-white">Ahmad Rahman</span>
+        </div>
+        <p class="mb-8 text-gray-400 text-lg">
+          Saktësi 98% në Aviator, Mines dhe Penalty. Parashikime në kohë reale dhe tërheqje të menjëhershme!
+        </p>
+
+        <div class="flex flex-col space-y-4">
+          <input id="userId" type="number" placeholder="Shkruani ID-në tuaj të 1xBet" class="bg-gray-800 border border-gray-600 text-white p-4 rounded-xl focus:outline-none focus:border-green-400 transition-colors text-center text-lg shadow-inner" />
+          <button id="connectButton" class="btn-primary hover:shadow-lg hover:scale-105 text-white font-bold py-4 rounded-xl text-lg transition-all duration-300">
+            Lidh llogarinë
+          </button>
+        </div>
+
+        <div id="connectionSuccess" class="hidden mt-8 p-4 bg-green-900 bg-opacity-40 border border-green-500 rounded-xl text-green-300 transform transition-all">
+          <p class="font-bold text-lg mb-2">✅ ID e llogarisë: <span id="accountIdDisplay" class="text-white"></span> u lidh!</p>
+          <p class="text-sm">Statusi: Aktiv | Algoritmi i AI është gati</p>
+          <button id="getSignalButton" class="w-full mt-4 btn-success hover:shadow-lg hover:scale-105 text-white font-bold py-3 rounded-xl text-lg transition-all duration-300">
+            🔮 Merr Sinjal
+          </button>
+        </div>
+
+        <div id="errorBox" class="hidden mt-8 glass-card border-red-500 p-6 rounded-xl relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+          <h2 class="text-2xl font-bold mb-3 text-red-400 flex items-center justify-center gap-2">
+            <span>⚠️</span> Depozita nuk u gjet
+          </h2>
+          <p class="mb-6 text-gray-300 text-sm md:text-base">
+            Duket se bilanci juaj është bosh. Bëni një depozitë prej të paktën <strong class="text-white text-lg">1000 Lek</strong> për të zhbllokuar qasjen në sinjale.
+          </p>
+          <a href="https://reffpa.com/L?tag=d_3290065m_97c_&site=3290065&ad=97&r=registration" target="_blank" class="block w-full btn-warning text-black hover:scale-105 font-extrabold py-3 px-4 rounded-xl transition-all duration-300 mb-6 shadow-lg shadow-yellow-500/30">
+            💳 Depozito tani në 1xBet
+          </a>
+          
+          <div class="bg-black bg-opacity-50 p-4 rounded-lg border border-gray-700">
+            <p class="text-sm text-gray-400 mb-2">Kodi juaj promocional:</p>
+            <div class="text-2xl font-black tracking-widest text-green-400 mb-2 bg-gray-900 py-2 rounded border border-dashed border-green-500 cursor-pointer hover:bg-gray-800 transition">
+              FARAH100
+            </div>
+            <p class="text-xs text-gray-500 italic">Regjistrohuni <span class="underline text-red-400">vetëm</span> me këtë kod për të aktivizuar AI-në.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="games" class="py-16 px-6 relative z-10 bg-gray-900 bg-opacity-50">
+      <h3 class="text-3xl font-bold text-center text-white mb-10">Lojërat e <span class="text-green-400">Mbështetura</span></h3>
+      <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="glass-card p-8 rounded-2xl hover:border-green-400 transition-colors duration-300 group">
+          <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">✈️</div>
+          <h4 class="text-xl font-bold mb-3">Aviator</h4>
+          <p class="text-gray-400 text-sm">Parashikoni se kur të tërhiqni paratë para se avioni të ngrihet. AI ynë zbulon modelet në kohë reale.</p>
+        </div>
+        <div class="glass-card p-8 rounded-2xl hover:border-green-400 transition-colors duration-300 group">
+          <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">💣</div>
+          <h4 class="text-xl font-bold mb-3">Mines</h4>
+          <p class="text-gray-400 text-sm">Shmangni bombat, merrni fitimin tuaj. Sistemi gjen rrugë me rrezik të ulët për fitime maksimale.</p>
+        </div>
+        <div class="glass-card p-8 rounded-2xl hover:border-green-400 transition-colors duration-300 group">
+          <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">⚽</div>
+          <h4 class="text-xl font-bold mb-3">Penalty</h4>
+          <p class="text-gray-400 text-sm">Dijeni se ku të gjuani. Mposhtni portierin me parashikime të bazuara në të dhëna.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-16 px-6 grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+      <div>
+        <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">🏆 Fituesit e Sotëm</h3>
+        <div class="glass-card p-6 rounded-2xl space-y-3 h-[300px] overflow-hidden relative">
+          <div class="absolute top-0 left-0 w-full h-8 bg-gradient-to-b from-gray-800 to-transparent z-10"></div>
+          <div class="animate-marquee space-y-3 text-sm font-mono text-gray-300">
+            <div class="flex justify-between border-b border-gray-700 pb-2"><span>👤 1218473***</span> <span class="text-green-400 font-bold">+506,560 Lek</span></div>
+            <div class="flex justify-between border-b border-gray-700 pb-2"><span>👤 9912384***</span> <span class="text-green-400 font-bold">+438,000 Lek</span></div>
+            <div class="flex justify-between border-b border-gray-700 pb-2"><span>👤 3099234***</span> <span class="text-green-400 font-bold">+282,400 Lek</span></div>
+            <div class="flex justify-between border-b border-gray-700 pb-2"><span>👤 1187339***</span> <span class="text-green-400 font-bold">+200,000 Lek</span></div>
+            <div class="flex justify-between border-b border-gray-700 pb-2"><span>👤 4412900***</span> <span class="text-green-400 font-bold">+257,000 Lek</span></div>
+            <div class="flex justify-between border-b border-gray-700 pb-2"><span>👤 8283721***</span> <span class="text-green-400 font-bold">+368,800 Lek</span></div>
+            <div class="flex justify-between pb-2"><span>👤 7751937***</span> <span class="text-green-400 font-bold">+214,100 Lek</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">💻 Konsola AI</h3>
+        <div class="console-box text-sm leading-relaxed" id="console">
+          <p class="text-gray-500">Përgatitja e mjedisit...</p>
+          <p class="text-blue-400">[SISTEMI] Inicializimi u krye me sukses.</p>
+          <p>[INFO] Shërbimi i parashikimit është aktiv ✅</p>
+          <p>[INFO] Në pritje të lidhjes së përdoruesit...</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bg-black py-8 text-center border-t border-gray-800 mt-auto">
+      <p class="text-gray-500 text-sm">© 2025 AI Predictions. Nuk jemi të lidhur me 1xBet. Përdoreni me përgjegjësi.</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // Убираем экран загрузки
+    setTimeout(() => {
+      document.getElementById("loading").classList.add("hidden-screen");
+      document.getElementById("mainContent").classList.remove("hidden-screen");
+    }, 2000);
+
+    const consoleBox = document.getElementById("console");
+
+    function addLog(message, color = "text-green-400") {
+      const p = document.createElement("p");
+      p.className = color;
+      p.innerText = message;
+      consoleBox.appendChild(p);
+      consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
+
+    // Логика подключения
+    document.getElementById("connectButton").addEventListener("click", () => {
+      const userId = document.getElementById("userId").value;
+      const btn = document.getElementById("connectButton");
+      
+      if (userId.length < 5) {
+        alert("Ju lutemi shkruani një ID të vlefshme!");
+        return;
+      }
+
+      // Имитация загрузки
+      btn.innerText = "Po lidhet...";
+      btn.classList.add("opacity-75", "cursor-not-allowed");
+      addLog(`[RETH] Po verifikohet ID: ${userId}...`, "text-yellow-400");
+
+      setTimeout(() => {
+        btn.classList.add("hidden");
+        document.getElementById("accountIdDisplay").innerText = userId;
+        document.getElementById("connectionSuccess").classList.remove("hidden");
+        addLog(`[SUKSES] ID ${userId} u lidh me serverin kryesor.`, "text-blue-400");
+      }, 1500);
+    });
+
+    // Логика получения сигнала (вызов ошибки депозита)
+    document.getElementById("getSignalButton").addEventListener("click", () => {
+      const btn = document.getElementById("getSignalButton");
+      
+      btn.innerText = "Duke analizuar...";
+      btn.classList.add("animate-pulse");
+      addLog(`[AI] Duke skanuar algoritmin e lojës...`, "text-yellow-400");
+      
+      setTimeout(() => {
+        addLog(`[GABIM] Llogaria nuk ka fonde të mjaftueshme!`, "text-red-500");
+        addLog(`[SISTEMI] Kërkohet depozitë minimale: 1000 Lek.`, "text-red-500");
+        
+        btn.innerText = "🔮 Merr Sinjal";
+        btn.classList.remove("animate-pulse");
+        document.getElementById("errorBox").classList.remove("hidden");
+        
+        // Скролл к ошибке
+        document.getElementById("errorBox").scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 2000);
+    });
+  </script>
 </body>
 </html>
